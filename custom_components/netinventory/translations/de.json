@@ -1,0 +1,62 @@
+{
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "user": {
+        "title": "NetInventory verbinden",
+        "description": "Adresse des NetInventory-Containers und ein API-Schlüssel (NetInventory › Benutzer & API › Schlüssel erzeugen).",
+        "data": {"host": "Host", "port": "Port", "token": "API-Schlüssel", "ssl": "HTTPS verwenden", "verify_ssl": "Zertifikat prüfen"}
+      },
+      "zeroconf_confirm": {
+        "title": "NetInventory gefunden",
+        "description": "{name} wurde unter {url} gefunden. Dort unter „Benutzer & API“ einen API-Schlüssel erzeugen und hier eintragen.",
+        "data": {"token": "API-Schlüssel"}
+      },
+      "reauth_confirm": {"title": "Neuer API-Schlüssel", "description": "Der API-Schlüssel wurde abgelehnt. Bitte einen neuen aus NetInventory eintragen.", "data": {"token": "API-Schlüssel"}},
+      "reconfigure": {
+        "title": "Verbindung ändern",
+        "data": {"host": "Host", "port": "Port", "token": "API-Schlüssel (leer = unverändert)", "ssl": "HTTPS verwenden", "verify_ssl": "Zertifikat prüfen"}
+      }
+    },
+    "error": {"cannot_connect": "NetInventory ist nicht erreichbar", "invalid_auth": "API-Schlüssel abgelehnt"},
+    "abort": {
+      "already_configured": "Diese NetInventory-Instanz ist bereits eingerichtet",
+      "no_id": "Der gefundene Dienst hat keine Instanz-ID",
+      "reauth_successful": "API-Schlüssel aktualisiert",
+      "reconfigure_successful": "Verbindung geändert",
+      "unique_id_mismatch": "Das ist eine andere NetInventory-Instanz"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "NetInventory-Optionen",
+        "data": {
+          "scan_interval": "Abfrage-Intervall",
+          "types": "Nur diese Gerätetypen (leer = alle)",
+          "only_agent": "Nur Geräte mit HASS.Agent",
+          "remove_stale": "Geräte entfernen, die es in NetInventory nicht mehr gibt"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {"online": {"name": "Online"}, "agent_online": {"name": "HASS.Agent"}},
+    "sensor": {
+      "ip": {"name": "IP-Adresse"}, "mac": {"name": "MAC-Adresse"}, "network": {"name": "Netzwerk"},
+      "user": {"name": "Benutzer"}, "logged_in_user": {"name": "Angemeldeter Benutzer"}, "last_online": {"name": "Zuletzt online"}
+    },
+    "button": {"wake": {"name": "Einschalten (WoL)"}, "check": {"name": "Erreichbarkeit prüfen"}}
+  },
+  "services": {
+    "wake": {"name": "Gerät wecken", "description": "Sendet Wake-on-LAN (Container oder OPNsense, wie in NetInventory eingestellt).",
+      "fields": {"device_id": {"name": "Gerät", "description": "NetInventory-Gerät(e)"}}},
+    "command": {"name": "Befehl ausführen", "description": "Führt einen HASS.Agent-Befehl auf dem Gerät aus, über Schlüssel oder Kategorie (shutdown, restart, sleep, hibernate, lock, logoff, monitor). Der Befehl wake sendet Wake-on-LAN.",
+      "fields": {"device_id": {"name": "Gerät", "description": "NetInventory-Gerät(e)"},
+        "command": {"name": "Befehl", "description": "Schlüssel oder Kategorie des Befehls, z. B. shutdown"},
+        "value": {"name": "Wert", "description": "Bei Schalter-Befehlen: on/off (leer = umschalten)"}}},
+    "scan": {"name": "Netzwerke scannen", "description": "Startet einen Netzwerk-Scan in NetInventory.",
+      "fields": {"network_id": {"name": "Netzwerk-ID", "description": "Nur dieses Netzwerk (leer = alle)"}}},
+    "refresh": {"name": "Aktualisieren", "description": "Holt sofort die aktuellen Daten aus NetInventory."}
+  }
+}

@@ -1,0 +1,36 @@
+wake:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: netinventory
+          multiple: true
+command:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: netinventory
+          multiple: true
+    command:
+      required: true
+      example: shutdown
+      selector:
+        text:
+    value:
+      required: false
+      example: "on"
+      selector:
+        text:
+scan:
+  fields:
+    network_id:
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 100000
+          mode: box
+refresh:
