@@ -1,7 +1,7 @@
-"""Constants for NetInventory."""
+"""Constants for NINA."""
 from __future__ import annotations
 
-DOMAIN = "netinventory"
+DOMAIN = "nina_inventory"
 PLATFORMS = ["binary_sensor", "button", "sensor", "switch"]
 
 CONF_TOKEN = "token"
@@ -15,7 +15,7 @@ CONF_REMOVE_STALE = "remove_stale"
 DEFAULT_PORT = 8080
 DEFAULT_INTERVAL = 15
 
-# Device types of the NetInventory container (key -> German label)
+# Device types of the NINA container (key -> German label)
 TYPES = {
     "pc": "PC", "laptop": "Laptop", "server": "Server", "vm": "Virtuelle Maschine", "nas": "NAS",
     "netzwerk": "Switch / Access-Point", "router": "Router / Firewall", "drucker": "Drucker",

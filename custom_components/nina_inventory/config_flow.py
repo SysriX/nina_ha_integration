@@ -1,4 +1,4 @@
-"""Config flow: automatic discovery via zeroconf (_netinventory._tcp) or manual host/port + API key."""
+"""Config flow: automatic discovery via zeroconf (_nina._tcp) or manual host/port + API key."""
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -15,7 +15,7 @@ from homeassistant.helpers.selector import (BooleanSelector, NumberSelector, Num
                                             TextSelectorConfig, TextSelectorType)
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from .api import NetInventoryApi, NetInventoryAuthError, NetInventoryError
+from .api import NinaApi, NinaAuthError, NinaError
 from .const import (CONF_INTERVAL, CONF_ONLY_AGENT, CONF_REMOVE_STALE, CONF_SSL, CONF_TOKEN, CONF_TYPES, CONF_VERIFY_SSL,
                     DEFAULT_INTERVAL, DEFAULT_PORT, DOMAIN, TYPES)
 
@@ -23,12 +23,12 @@ _PW = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
 
 
 async def _check(hass, data: dict) -> dict:
-    api = NetInventoryApi(async_get_clientsession(hass, verify_ssl=data.get(CONF_VERIFY_SSL, True)), data[CONF_HOST],
+    api = NinaApi(async_get_clientsession(hass, verify_ssl=data.get(CONF_VERIFY_SSL, True)), data[CONF_HOST],
                           int(data[CONF_PORT]), data[CONF_TOKEN], data.get(CONF_SSL, False), data.get(CONF_VERIFY_SSL, True))
     return await api.info()
 
 
-class NetInventoryConfigFlow(ConfigFlow, domain=DOMAIN):
+class NinaConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     def __init__(self) -> None:
@@ -37,9 +37,9 @@ class NetInventoryConfigFlow(ConfigFlow, domain=DOMAIN):
     async def _try(self, data: dict, errors: dict) -> dict | None:
         try:
             return await _check(self.hass, data)
-        except NetInventoryAuthError:
+        except NinaAuthError:
             errors["base"] = "invalid_auth"
-        except NetInventoryError:
+        except NinaError:
             errors["base"] = "cannot_connect"
         return None
 
@@ -50,7 +50,7 @@ class NetInventoryConfigFlow(ConfigFlow, domain=DOMAIN):
             if info:
                 await self.async_set_unique_id(info["id"])
                 self._abort_if_unique_id_configured(updates={CONF_HOST: user_input[CONF_HOST], CONF_PORT: user_input[CONF_PORT]})
-                return self.async_create_entry(title=info.get("name") or "NetInventory", data=user_input)
+                return self.async_create_entry(title=info.get("name") or "NINA", data=user_input)
         d = user_input or {}
         schema = vol.Schema({
             vol.Required(CONF_HOST, default=d.get(CONF_HOST, "")): str,
@@ -69,7 +69,7 @@ class NetInventoryConfigFlow(ConfigFlow, domain=DOMAIN):
         host = str(discovery_info.ip_address)
         await self.async_set_unique_id(inst)
         self._abort_if_unique_id_configured(updates={CONF_HOST: host, CONF_PORT: discovery_info.port})
-        self._found = {CONF_HOST: host, CONF_PORT: discovery_info.port, "name": props.get("name") or "NetInventory"}
+        self._found = {CONF_HOST: host, CONF_PORT: discovery_info.port, "name": props.get("name") or "NINA"}
         self.context["title_placeholders"] = {"name": self._found["name"], "host": host}
         return await self.async_step_zeroconf_confirm()
 
@@ -121,10 +121,10 @@ class NetInventoryConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
-        return NetInventoryOptionsFlow()
+        return NinaOptionsFlow()
 
 
-class NetInventoryOptionsFlow(OptionsFlowWithReload):
+class NinaOptionsFlow(OptionsFlowWithReload):
     async def async_step_init(self, user_input: dict | None = None) -> ConfigFlowResult:
         if user_input is not None:
             return self.async_create_entry(data=user_input)

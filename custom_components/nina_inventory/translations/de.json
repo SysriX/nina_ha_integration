@@ -3,39 +3,39 @@
     "flow_title": "{name} ({host})",
     "step": {
       "user": {
-        "title": "NetInventory verbinden",
-        "description": "Adresse des NetInventory-Containers und ein API-Schlüssel (NetInventory › Benutzer & API › Schlüssel erzeugen).",
+        "title": "NINA verbinden",
+        "description": "Adresse des NINA-Containers und ein API-Schlüssel (NINA › Benutzer & API › Schlüssel erzeugen).",
         "data": {"host": "Host", "port": "Port", "token": "API-Schlüssel", "ssl": "HTTPS verwenden", "verify_ssl": "Zertifikat prüfen"}
       },
       "zeroconf_confirm": {
-        "title": "NetInventory gefunden",
+        "title": "NINA gefunden",
         "description": "{name} wurde unter {url} gefunden. Dort unter „Benutzer & API“ einen API-Schlüssel erzeugen und hier eintragen.",
         "data": {"token": "API-Schlüssel"}
       },
-      "reauth_confirm": {"title": "Neuer API-Schlüssel", "description": "Der API-Schlüssel wurde abgelehnt. Bitte einen neuen aus NetInventory eintragen.", "data": {"token": "API-Schlüssel"}},
+      "reauth_confirm": {"title": "Neuer API-Schlüssel", "description": "Der API-Schlüssel wurde abgelehnt. Bitte einen neuen aus NINA eintragen.", "data": {"token": "API-Schlüssel"}},
       "reconfigure": {
         "title": "Verbindung ändern",
         "data": {"host": "Host", "port": "Port", "token": "API-Schlüssel (leer = unverändert)", "ssl": "HTTPS verwenden", "verify_ssl": "Zertifikat prüfen"}
       }
     },
-    "error": {"cannot_connect": "NetInventory ist nicht erreichbar", "invalid_auth": "API-Schlüssel abgelehnt"},
+    "error": {"cannot_connect": "NINA ist nicht erreichbar", "invalid_auth": "API-Schlüssel abgelehnt"},
     "abort": {
-      "already_configured": "Diese NetInventory-Instanz ist bereits eingerichtet",
+      "already_configured": "Diese NINA-Instanz ist bereits eingerichtet",
       "no_id": "Der gefundene Dienst hat keine Instanz-ID",
       "reauth_successful": "API-Schlüssel aktualisiert",
       "reconfigure_successful": "Verbindung geändert",
-      "unique_id_mismatch": "Das ist eine andere NetInventory-Instanz"
+      "unique_id_mismatch": "Das ist eine andere NINA-Instanz"
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "NetInventory-Optionen",
+        "title": "NINA-Optionen",
         "data": {
           "scan_interval": "Abfrage-Intervall",
           "types": "Nur diese Gerätetypen (leer = alle)",
           "only_agent": "Nur Geräte mit HASS.Agent",
-          "remove_stale": "Geräte entfernen, die es in NetInventory nicht mehr gibt"
+          "remove_stale": "Geräte entfernen, die es in NINA nicht mehr gibt"
         }
       }
     }
@@ -49,14 +49,14 @@
     "button": {"wake": {"name": "Einschalten (WoL)"}, "check": {"name": "Erreichbarkeit prüfen"}}
   },
   "services": {
-    "wake": {"name": "Gerät wecken", "description": "Sendet Wake-on-LAN (Container oder OPNsense, wie in NetInventory eingestellt).",
-      "fields": {"device_id": {"name": "Gerät", "description": "NetInventory-Gerät(e)"}}},
+    "wake": {"name": "Gerät wecken", "description": "Sendet Wake-on-LAN (Container oder OPNsense, wie in NINA eingestellt).",
+      "fields": {"device_id": {"name": "Gerät", "description": "NINA-Gerät(e)"}}},
     "command": {"name": "Befehl ausführen", "description": "Führt einen HASS.Agent-Befehl auf dem Gerät aus, über Schlüssel oder Kategorie (shutdown, restart, sleep, hibernate, lock, logoff, monitor). Der Befehl wake sendet Wake-on-LAN.",
-      "fields": {"device_id": {"name": "Gerät", "description": "NetInventory-Gerät(e)"},
+      "fields": {"device_id": {"name": "Gerät", "description": "NINA-Gerät(e)"},
         "command": {"name": "Befehl", "description": "Schlüssel oder Kategorie des Befehls, z. B. shutdown"},
         "value": {"name": "Wert", "description": "Bei Schalter-Befehlen: on/off (leer = umschalten)"}}},
-    "scan": {"name": "Netzwerke scannen", "description": "Startet einen Netzwerk-Scan in NetInventory.",
+    "scan": {"name": "Netzwerke scannen", "description": "Startet einen Netzwerk-Scan in NINA.",
       "fields": {"network_id": {"name": "Netzwerk-ID", "description": "Nur dieses Netzwerk (leer = alle)"}}},
-    "refresh": {"name": "Aktualisieren", "description": "Holt sofort die aktuellen Daten aus NetInventory."}
+    "refresh": {"name": "Aktualisieren", "description": "Holt sofort die aktuellen Daten aus NINA."}
   }
 }

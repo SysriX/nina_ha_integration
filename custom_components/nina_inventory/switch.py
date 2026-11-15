@@ -6,11 +6,11 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 
-from .api import NetInventoryError
-from .entity import NetInventoryEntity, add_dynamic
+from .api import NinaError
+from .entity import NinaEntity, add_dynamic
 
 
-class CommandSwitch(NetInventoryEntity, SwitchEntity):
+class CommandSwitch(NinaEntity, SwitchEntity):
     def __init__(self, coordinator, device_id: int, b: dict) -> None:
         super().__init__(coordinator, device_id, f"cmd_{b['schluessel']}", "switch", suffix=b.get("anzeige") or b["schluessel"])
         self.schluessel = b["schluessel"]
@@ -33,7 +33,7 @@ class CommandSwitch(NetInventoryEntity, SwitchEntity):
     async def _send(self, on: bool) -> None:
         try:
             await self.coordinator.api.command(self.device_id, self.schluessel, "on" if on else "off")
-        except NetInventoryError as err:
+        except NinaError as err:
             raise HomeAssistantError(str(err)) from err
         await self.coordinator.async_request_refresh()
 

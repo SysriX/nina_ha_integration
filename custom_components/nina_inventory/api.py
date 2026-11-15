@@ -1,4 +1,4 @@
-"""Small async client for the NetInventory API (/api/ha/v1)."""
+"""Small async client for the NINA API (/api/ha/v1)."""
 from __future__ import annotations
 
 from typing import Any
@@ -6,15 +6,15 @@ from typing import Any
 import aiohttp
 
 
-class NetInventoryError(Exception):
+class NinaError(Exception):
     """Communication or API error."""
 
 
-class NetInventoryAuthError(NetInventoryError):
+class NinaAuthError(NinaError):
     """API key rejected."""
 
 
-class NetInventoryApi:
+class NinaApi:
     def __init__(self, session: aiohttp.ClientSession, host: str, port: int, token: str,
                  ssl: bool = False, verify_ssl: bool = True) -> None:
         self._session = session
@@ -30,14 +30,14 @@ class NetInventoryApi:
                 timeout=aiohttp.ClientTimeout(total=timeout), ssl=None if self._verify else False,
             ) as r:
                 if r.status in (401, 403):
-                    raise NetInventoryAuthError(await self._detail(r))
+                    raise NinaAuthError(await self._detail(r))
                 if r.status >= 400:
-                    raise NetInventoryError(f"HTTP {r.status}: {await self._detail(r)}")
+                    raise NinaError(f"HTTP {r.status}: {await self._detail(r)}")
                 return await r.json()
-        except NetInventoryError:
+        except NinaError:
             raise
         except (aiohttp.ClientError, TimeoutError) as err:
-            raise NetInventoryError(f"{self.base} not reachable: {err}") from err
+            raise NinaError(f"{self.base} not reachable: {err}") from err
 
     @staticmethod
     async def _detail(r: aiohttp.ClientResponse) -> str:

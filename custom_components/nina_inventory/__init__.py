@@ -1,8 +1,8 @@
-"""NetInventory – network / IT device inventory (container) in Home Assistant.
+"""NINA – network / IT device inventory (container) in Home Assistant.
 
 Each device of the inventory becomes a Home Assistant device with online status, IP/MAC, user, the
 HASS.Agent sensors (classified by name patterns in the container) and buttons for Wake-on-LAN and the
-HASS.Agent commands. Services for automations: netinventory.wake, netinventory.command, netinventory.scan.
+HASS.Agent commands. Services for automations: nina_inventory.wake, nina_inventory.command, nina_inventory.scan.
 """
 from __future__ import annotations
 
@@ -17,15 +17,15 @@ from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady,
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import NetInventoryApi, NetInventoryAuthError, NetInventoryError
+from .api import NinaApi, NinaAuthError, NinaError
 from .const import (ATTR_COMMAND, ATTR_NETWORK_ID, ATTR_VALUE, CONF_REMOVE_STALE, CONF_SSL, CONF_TOKEN, CONF_VERIFY_SSL,
                     DOMAIN, PLATFORMS, SERVICE_COMMAND, SERVICE_REFRESH, SERVICE_SCAN, SERVICE_WAKE)
-from .coordinator import NetInventoryCoordinator
+from .coordinator import NinaCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
-type NetInventoryConfigEntry = ConfigEntry[NetInventoryCoordinator]
+type NinaConfigEntry = ConfigEntry[NinaCoordinator]
 
 
 async def async_setup(hass: HomeAssistant, config) -> bool:
@@ -33,17 +33,17 @@ async def async_setup(hass: HomeAssistant, config) -> bool:
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: NetInventoryConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: NinaConfigEntry) -> bool:
     d = entry.data
-    api = NetInventoryApi(async_get_clientsession(hass, verify_ssl=d.get(CONF_VERIFY_SSL, True)), d[CONF_HOST], d[CONF_PORT],
+    api = NinaApi(async_get_clientsession(hass, verify_ssl=d.get(CONF_VERIFY_SSL, True)), d[CONF_HOST], d[CONF_PORT],
                           d[CONF_TOKEN], d.get(CONF_SSL, False), d.get(CONF_VERIFY_SSL, True))
     try:
         info = await api.info()
-    except NetInventoryAuthError as err:
+    except NinaAuthError as err:
         raise ConfigEntryAuthFailed(str(err)) from err
-    except NetInventoryError as err:
+    except NinaError as err:
         raise ConfigEntryNotReady(str(err)) from err
-    coord = NetInventoryCoordinator(hass, entry, api, info["id"])
+    coord = NinaCoordinator(hass, entry, api, info["id"])
     await coord.async_config_entry_first_refresh()
     entry.runtime_data = coord
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -52,7 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: NetInventoryConfigEntry)
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: NetInventoryConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: NinaConfigEntry) -> bool:
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         for u in entry.runtime_data.unsubs:
@@ -60,7 +60,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: NetInventoryConfigEntry
     return ok
 
 
-async def async_remove_config_entry_device(hass: HomeAssistant, entry: NetInventoryConfigEntry, device: dr.DeviceEntry) -> bool:
+async def async_remove_config_entry_device(hass: HomeAssistant, entry: NinaConfigEntry, device: dr.DeviceEntry) -> bool:
     """Allow deleting a device in HA when it is no longer delivered by the container."""
     coord = entry.runtime_data
     for dom, ident in device.identifiers:
@@ -73,18 +73,18 @@ async def async_remove_config_entry_device(hass: HomeAssistant, entry: NetInvent
     return True
 
 
-def _remove_stale_devices(hass: HomeAssistant, entry: ConfigEntry, coord: NetInventoryCoordinator) -> None:
+def _remove_stale_devices(hass: HomeAssistant, entry: ConfigEntry, coord: NinaCoordinator) -> None:
     reg = dr.async_get(hass)
     present = {f"{coord.instance}_{i}" for i in (coord.data or {})}
     for dev in dr.async_entries_for_config_entry(reg, entry.entry_id):
         idents = [i for dom, i in dev.identifiers if dom == DOMAIN]
         if idents and not any(i in present for i in idents):
-            _LOGGER.info("Removing device %s (no longer in NetInventory)", dev.name)
+            _LOGGER.info("Removing device %s (no longer in NINA)", dev.name)
             reg.async_update_device(dev.id, remove_config_entry_id=entry.entry_id)
 
 
 # ------------------------------------------------------------------ services
-def _targets(hass: HomeAssistant, call: ServiceCall) -> list[tuple[NetInventoryCoordinator, int]]:
+def _targets(hass: HomeAssistant, call: ServiceCall) -> list[tuple[NinaCoordinator, int]]:
     ids = call.data.get(ATTR_DEVICE_ID) or []
     if isinstance(ids, str):
         ids = [ids]
@@ -102,12 +102,12 @@ def _targets(hass: HomeAssistant, call: ServiceCall) -> list[tuple[NetInventoryC
             e = entries.get(eid)
             if not e:
                 continue
-            coord: NetInventoryCoordinator = e.runtime_data
+            coord: NinaCoordinator = e.runtime_data
             for dom, ident in dev.identifiers:
                 if dom == DOMAIN and ident.startswith(coord.instance + "_"):
                     hit = (coord, int(ident.rsplit("_", 1)[1]))
         if not hit:
-            raise ServiceValidationError(f"{dev.name} is not a NetInventory device")
+            raise ServiceValidationError(f"{dev.name} is not a NINA device")
         out.append(hit)
     return out
 
@@ -118,7 +118,7 @@ def _register_services(hass: HomeAssistant) -> None:
         for coord, gid in _targets(hass, call):
             try:
                 res[str(gid)] = await coord.api.wake(gid)
-            except NetInventoryError as err:
+            except NinaError as err:
                 raise HomeAssistantError(str(err)) from err
         return {"results": res} if call.return_response else None
 
@@ -127,7 +127,7 @@ def _register_services(hass: HomeAssistant) -> None:
         for coord, gid in _targets(hass, call):
             try:
                 res[str(gid)] = await coord.api.command(gid, call.data[ATTR_COMMAND], call.data.get(ATTR_VALUE))
-            except NetInventoryError as err:
+            except NinaError as err:
                 raise HomeAssistantError(str(err)) from err
             await coord.async_request_refresh()
         return {"results": res} if call.return_response else None
@@ -137,7 +137,7 @@ def _register_services(hass: HomeAssistant) -> None:
         for e in hass.config_entries.async_loaded_entries(DOMAIN):
             try:
                 out.append(await e.runtime_data.api.scan(call.data.get(ATTR_NETWORK_ID)))
-            except NetInventoryError as err:
+            except NinaError as err:
                 raise HomeAssistantError(str(err)) from err
             await e.runtime_data.async_request_refresh()
         return {"results": out} if call.return_response else None

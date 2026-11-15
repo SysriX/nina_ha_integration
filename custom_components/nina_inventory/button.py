@@ -7,11 +7,11 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 
-from .api import NetInventoryError
-from .entity import NetInventoryEntity, add_dynamic
+from .api import NinaError
+from .entity import NinaEntity, add_dynamic
 
 
-class WakeButton(NetInventoryEntity, ButtonEntity):
+class WakeButton(NinaEntity, ButtonEntity):
     _attr_translation_key = "wake"
     _attr_icon = "mdi:power"
 
@@ -21,11 +21,11 @@ class WakeButton(NetInventoryEntity, ButtonEntity):
     async def async_press(self) -> None:
         try:
             await self.coordinator.api.wake(self.device_id)
-        except NetInventoryError as err:
+        except NinaError as err:
             raise HomeAssistantError(str(err)) from err
 
 
-class CheckButton(NetInventoryEntity, ButtonEntity):
+class CheckButton(NinaEntity, ButtonEntity):
     _attr_translation_key = "check"
     _attr_icon = "mdi:lan-pending"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -36,12 +36,12 @@ class CheckButton(NetInventoryEntity, ButtonEntity):
     async def async_press(self) -> None:
         try:
             await self.coordinator.api.check(self.device_id)
-        except NetInventoryError as err:
+        except NinaError as err:
             raise HomeAssistantError(str(err)) from err
         await self.coordinator.async_request_refresh()
 
 
-class CommandButton(NetInventoryEntity, ButtonEntity):
+class CommandButton(NinaEntity, ButtonEntity):
     def __init__(self, coordinator, device_id: int, b: dict) -> None:
         super().__init__(coordinator, device_id, f"cmd_{b['schluessel']}", "button", suffix=b.get("kategorie") or b.get("anzeige") or b["schluessel"])
         self.schluessel = b["schluessel"]
@@ -60,7 +60,7 @@ class CommandButton(NetInventoryEntity, ButtonEntity):
     async def async_press(self) -> None:
         try:
             await self.coordinator.api.command(self.device_id, self.schluessel)
-        except NetInventoryError as err:
+        except NinaError as err:
             raise HomeAssistantError(str(err)) from err
 
 

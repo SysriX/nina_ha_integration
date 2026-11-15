@@ -7,7 +7,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 
-from .entity import NetInventoryEntity, add_dynamic
+from .entity import NinaEntity, add_dynamic
 
 _DEVICE_CLASSES = {c.value for c in SensorDeviceClass}
 _STATE_CLASSES = {c.value for c in SensorStateClass}
@@ -20,7 +20,7 @@ def _num(v):
         return None
 
 
-class InfoSensor(NetInventoryEntity, SensorEntity):
+class InfoSensor(NinaEntity, SensorEntity):
     """ip, mac, user, logged-in user, last online, network."""
 
     def __init__(self, coordinator, device_id: int, key: str) -> None:
@@ -56,7 +56,7 @@ class InfoSensor(NetInventoryEntity, SensorEntity):
                 **{f"extra_{k}": v for k, v in (d.get("extra") or {}).items()}}
 
 
-class AgentSensor(NetInventoryEntity, SensorEntity):
+class AgentSensor(NinaEntity, SensorEntity):
     """One HASS.Agent sensor, classified by the name patterns of the container."""
 
     def __init__(self, coordinator, device_id: int, s: dict) -> None:

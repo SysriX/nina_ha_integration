@@ -1,4 +1,4 @@
-"""Polls the NetInventory container."""
+"""Polls the NINA container."""
 from __future__ import annotations
 
 import logging
@@ -9,16 +9,16 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import NetInventoryApi, NetInventoryAuthError, NetInventoryError
+from .api import NinaApi, NinaAuthError, NinaError
 from .const import CONF_INTERVAL, CONF_ONLY_AGENT, CONF_TYPES, DEFAULT_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class NetInventoryCoordinator(DataUpdateCoordinator[dict[int, dict]]):
+class NinaCoordinator(DataUpdateCoordinator[dict[int, dict]]):
     """data = {device_id: device dict} (already filtered by the entry options)."""
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, api: NetInventoryApi, instance: str) -> None:
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, api: NinaApi, instance: str) -> None:
         super().__init__(hass, _LOGGER, name=DOMAIN, config_entry=entry,
                          update_interval=timedelta(seconds=int(entry.options.get(CONF_INTERVAL, DEFAULT_INTERVAL))))
         self.api = api
@@ -36,8 +36,8 @@ class NetInventoryCoordinator(DataUpdateCoordinator[dict[int, dict]]):
     async def _async_update_data(self) -> dict[int, dict]:
         try:
             res = await self.api.devices()
-        except NetInventoryAuthError as err:
+        except NinaAuthError as err:
             raise ConfigEntryAuthFailed(str(err)) from err
-        except NetInventoryError as err:
+        except NinaError as err:
             raise UpdateFailed(str(err)) from err
         return {d["id"]: d for d in res.get("geraete", []) if self.included(d)}

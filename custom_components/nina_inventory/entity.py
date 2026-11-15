@@ -10,7 +10,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, TYPES
-from .coordinator import NetInventoryCoordinator
+from .coordinator import NinaCoordinator
 
 _UML = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"})
 
@@ -20,16 +20,16 @@ def slug(text: str) -> str:
     return s or "x"
 
 
-def device_identifier(coordinator: NetInventoryCoordinator, device_id: int) -> tuple[str, str]:
+def device_identifier(coordinator: NinaCoordinator, device_id: int) -> tuple[str, str]:
     return (DOMAIN, f"{coordinator.instance}_{device_id}")
 
 
-class NetInventoryEntity(CoordinatorEntity[NetInventoryCoordinator]):
-    """An entity that belongs to one NetInventory device."""
+class NinaEntity(CoordinatorEntity[NinaCoordinator]):
+    """An entity that belongs to one NINA device."""
 
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator: NetInventoryCoordinator, device_id: int, key: str, platform: str,
+    def __init__(self, coordinator: NinaCoordinator, device_id: int, key: str, platform: str,
                  suffix: str | None = None) -> None:
         super().__init__(coordinator)
         self.device_id = device_id
@@ -65,7 +65,7 @@ class NetInventoryEntity(CoordinatorEntity[NetInventoryCoordinator]):
         return super().available and self.device_id in (self.coordinator.data or {})
 
 
-def add_dynamic(coordinator: NetInventoryCoordinator, async_add_entities,
+def add_dynamic(coordinator: NinaCoordinator, async_add_entities,
                 factory: Callable[[int, dict], Iterable[Entity]], unsub_list: list) -> None:
     """Create entities for all devices now and whenever new devices/sensors appear."""
     known: set[str] = set()

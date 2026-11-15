@@ -3,39 +3,39 @@
     "flow_title": "{name} ({host})",
     "step": {
       "user": {
-        "title": "Connect NetInventory",
-        "description": "Address of the NetInventory container and an API key (NetInventory › Users & API › Create key).",
+        "title": "Connect NINA",
+        "description": "Address of the NINA container and an API key (NINA › Users & API › Create key).",
         "data": {"host": "Host", "port": "Port", "token": "API key", "ssl": "Use HTTPS", "verify_ssl": "Verify certificate"}
       },
       "zeroconf_confirm": {
-        "title": "NetInventory found",
+        "title": "NINA found",
         "description": "{name} was found at {url}. Create an API key there (Users & API › Create key) and enter it here.",
         "data": {"token": "API key"}
       },
-      "reauth_confirm": {"title": "New API key", "description": "The API key was rejected. Enter a new key from NetInventory.", "data": {"token": "API key"}},
+      "reauth_confirm": {"title": "New API key", "description": "The API key was rejected. Enter a new key from NINA.", "data": {"token": "API key"}},
       "reconfigure": {
         "title": "Change connection",
         "data": {"host": "Host", "port": "Port", "token": "API key (empty = unchanged)", "ssl": "Use HTTPS", "verify_ssl": "Verify certificate"}
       }
     },
-    "error": {"cannot_connect": "NetInventory is not reachable", "invalid_auth": "API key rejected"},
+    "error": {"cannot_connect": "NINA is not reachable", "invalid_auth": "API key rejected"},
     "abort": {
-      "already_configured": "This NetInventory instance is already set up",
+      "already_configured": "This NINA instance is already set up",
       "no_id": "The discovered service has no instance id",
       "reauth_successful": "API key updated",
       "reconfigure_successful": "Connection updated",
-      "unique_id_mismatch": "This is a different NetInventory instance"
+      "unique_id_mismatch": "This is a different NINA instance"
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "NetInventory options",
+        "title": "NINA options",
         "data": {
           "scan_interval": "Update interval",
           "types": "Only these device types (empty = all)",
           "only_agent": "Only devices with HASS.Agent",
-          "remove_stale": "Remove devices that are no longer in NetInventory"
+          "remove_stale": "Remove devices that are no longer in NINA"
         }
       }
     }
@@ -49,14 +49,14 @@
     "button": {"wake": {"name": "Wake (WoL)"}, "check": {"name": "Check reachability"}}
   },
   "services": {
-    "wake": {"name": "Wake device", "description": "Sends Wake-on-LAN (container or OPNsense, as configured in NetInventory).",
-      "fields": {"device_id": {"name": "Device", "description": "NetInventory device(s)"}}},
+    "wake": {"name": "Wake device", "description": "Sends Wake-on-LAN (container or OPNsense, as configured in NINA).",
+      "fields": {"device_id": {"name": "Device", "description": "NINA device(s)"}}},
     "command": {"name": "Run command", "description": "Runs a HASS.Agent command on the device, by key or category (shutdown, restart, sleep, hibernate, lock, logoff, monitor). The command wake sends Wake-on-LAN.",
-      "fields": {"device_id": {"name": "Device", "description": "NetInventory device(s)"},
+      "fields": {"device_id": {"name": "Device", "description": "NINA device(s)"},
         "command": {"name": "Command", "description": "Command key or category, e.g. shutdown"},
         "value": {"name": "Value", "description": "For switch commands: on/off (empty = toggle)"}}},
-    "scan": {"name": "Scan networks", "description": "Starts a network scan in NetInventory.",
+    "scan": {"name": "Scan networks", "description": "Starts a network scan in NINA.",
       "fields": {"network_id": {"name": "Network id", "description": "Only this network (empty = all)"}}},
-    "refresh": {"name": "Refresh", "description": "Fetch the current data from NetInventory now."}
+    "refresh": {"name": "Refresh", "description": "Fetch the current data from NINA now."}
   }
 }

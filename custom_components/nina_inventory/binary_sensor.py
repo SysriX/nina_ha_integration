@@ -6,12 +6,12 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 
-from .entity import NetInventoryEntity, add_dynamic
+from .entity import NinaEntity, add_dynamic
 
 _CLASSES = {c.value for c in BinarySensorDeviceClass}
 
 
-class OnlineSensor(NetInventoryEntity, BinarySensorEntity):
+class OnlineSensor(NinaEntity, BinarySensorEntity):
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
 
     def __init__(self, coordinator, device_id: int, key: str) -> None:
@@ -34,7 +34,7 @@ class OnlineSensor(NetInventoryEntity, BinarySensorEntity):
         return {"ip": d.get("ip"), "mac": d.get("mac"), "last_online": d.get("zuletzt_online"), "wake_on_lan": d.get("wol")}
 
 
-class AgentBinarySensor(NetInventoryEntity, BinarySensorEntity):
+class AgentBinarySensor(NinaEntity, BinarySensorEntity):
     def __init__(self, coordinator, device_id: int, s: dict) -> None:
         super().__init__(coordinator, device_id, f"agent_{s['schluessel']}", "binary_sensor", suffix=s.get("anzeige") or s["schluessel"])
         self.schluessel = s["schluessel"]
