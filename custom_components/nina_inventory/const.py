@@ -15,8 +15,8 @@ CONF_REMOVE_STALE = "remove_stale"
 DEFAULT_PORT = 8080
 DEFAULT_INTERVAL = 15
 
-# Device types of the NINA container (key -> German label)
-TYPES = {
+# Fallback labels for older containers (1.0) that do not deliver their type list
+TYPES_FALLBACK = {
     "pc": "PC", "laptop": "Laptop", "server": "Server", "vm": "Virtuelle Maschine", "nas": "NAS",
     "netzwerk": "Switch / Access-Point", "router": "Router / Firewall", "drucker": "Drucker",
     "telefon": "Telefon / Smartphone", "tablet": "Tablet", "tv": "TV / Medien", "kamera": "Kamera",

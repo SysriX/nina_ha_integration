@@ -6,7 +6,7 @@ Brings the devices of a [NINA](https://github.com/SysriX/nina_unraid) container 
 *Device page in the NINA web UI (UI in German)*
 
 Integration domain: `nina_inventory` (not `nina`, which is the built-in German warning app integration)  
-Version: 1.0.0  
+Version: 1.1.0  
 UI language of the container (sensor names from the pattern rules): German
 
 ## Features
@@ -53,12 +53,12 @@ data:
 
 ## Options
 
-Update interval, only certain device types, only devices with HASS.Agent, remove devices that disappeared from NINA.
+Update interval, only certain device types (the list comes live from the type catalog of the container; a device matches if any of its types is selected), only devices with HASS.Agent, remove devices that disappeared from NINA.
 
 ## Requirements
 
 - Home Assistant 2025.1 or newer
-- A running NINA container (1.0.0+) and an API key from *Benutzer & API*
+- A running NINA container (1.1.0+ for multiple types per device; 1.0 works with the main type only) and an API key from *Benutzer & API*
 - For discovery: container and Home Assistant in the same network (mDNS)
 
 ## Installation

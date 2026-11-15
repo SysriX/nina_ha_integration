@@ -51,7 +51,8 @@ class InfoSensor(NinaEntity, SensorEntity):
         if self.key != "ip":
             return None
         d = self.dev
-        return {"hostname": d.get("hostname"), "network": d.get("netzwerk"), "type": d.get("typ"),
+        return {"hostname": d.get("hostname"), "network": d.get("netzwerk"), "type": d.get("typ"), "types": d.get("typen") or [d.get("typ")],
+                "type_names": d.get("typ_namen") or [d.get("typ_name")], "manufacturer": d.get("hersteller"), "model": d.get("modell"),
                 "location": d.get("standort"), "inventory_number": d.get("inventarnummer"), "tags": d.get("tags"),
                 **{f"extra_{k}": v for k, v in (d.get("extra") or {}).items()}}
 

@@ -27,7 +27,7 @@ class NinaCoordinator(DataUpdateCoordinator[dict[int, dict]]):
 
     def included(self, d: dict) -> bool:
         types = self.config_entry.options.get(CONF_TYPES) or []
-        if types and d.get("typ") not in types:
+        if types and not set(types) & set(d.get("typen") or [d.get("typ")]):
             return False
         if self.config_entry.options.get(CONF_ONLY_AGENT) and not d.get("agent"):
             return False

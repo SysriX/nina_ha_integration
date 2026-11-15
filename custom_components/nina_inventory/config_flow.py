@@ -17,7 +17,7 @@ from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .api import NinaApi, NinaAuthError, NinaError
 from .const import (CONF_INTERVAL, CONF_ONLY_AGENT, CONF_REMOVE_STALE, CONF_SSL, CONF_TOKEN, CONF_TYPES, CONF_VERIFY_SSL,
-                    DEFAULT_INTERVAL, DEFAULT_PORT, DOMAIN, TYPES)
+                    DEFAULT_INTERVAL, DEFAULT_PORT, DOMAIN, TYPES_FALLBACK)
 
 _PW = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
 
@@ -129,11 +129,22 @@ class NinaOptionsFlow(OptionsFlowWithReload):
         if user_input is not None:
             return self.async_create_entry(data=user_input)
         o = self.config_entry.options
+        # device types are maintained in the container (catalog) – read them live
+        typen = [{"value": k, "label": v} for k, v in TYPES_FALLBACK.items()]
+        try:
+            info = await self.config_entry.runtime_data.api.info()
+            if info.get("typen"):
+                typen = [{"value": t["schluessel"], "label": t["name"]} for t in info["typen"]]
+        except Exception:  # noqa: BLE001
+            pass
+        for k in o.get(CONF_TYPES, []):
+            if k not in {t["value"] for t in typen}:
+                typen.append({"value": k, "label": k})
         return self.async_show_form(step_id="init", data_schema=vol.Schema({
             vol.Required(CONF_INTERVAL, default=o.get(CONF_INTERVAL, DEFAULT_INTERVAL)):
                 NumberSelector(NumberSelectorConfig(min=5, max=600, step=1, mode=NumberSelectorMode.BOX, unit_of_measurement="s")),
             vol.Optional(CONF_TYPES, default=o.get(CONF_TYPES, [])):
-                SelectSelector(SelectSelectorConfig(options=[{"value": k, "label": v} for k, v in TYPES.items()],
+                SelectSelector(SelectSelectorConfig(options=typen,
                                                     multiple=True, mode=SelectSelectorMode.DROPDOWN)),
             vol.Optional(CONF_ONLY_AGENT, default=o.get(CONF_ONLY_AGENT, False)): BooleanSelector(),
             vol.Optional(CONF_REMOVE_STALE, default=o.get(CONF_REMOVE_STALE, True)): BooleanSelector(),

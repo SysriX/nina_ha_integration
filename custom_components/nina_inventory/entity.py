@@ -9,7 +9,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, TYPES
+from .const import DOMAIN
 from .coordinator import NinaCoordinator
 
 _UML = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"})
@@ -44,7 +44,7 @@ class NinaEntity(CoordinatorEntity[NinaCoordinator]):
             # no MAC connection on purpose: it would merge with (and rename) devices of other integrations
             name=d.get("name"),
             manufacturer=d.get("hersteller") or None,
-            model=d.get("modell") or TYPES.get(d.get("typ"), d.get("typ")),
+            model=d.get("modell") or d.get("typ_name") or d.get("typ"),
             sw_version=(d.get("agent") or {}).get("version") or None,
             hw_version=d.get("betriebssystem") or None,
             serial_number=d.get("seriennummer") or None,
