@@ -44,6 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: NinaConfigEntry) -> bool
     except NinaError as err:
         raise ConfigEntryNotReady(str(err)) from err
     coord = NinaCoordinator(hass, entry, api, info["id"])
+    coord.info = info
     await coord.async_config_entry_first_refresh()
     entry.runtime_data = coord
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -75,7 +76,7 @@ async def async_remove_config_entry_device(hass: HomeAssistant, entry: NinaConfi
 
 def _remove_stale_devices(hass: HomeAssistant, entry: ConfigEntry, coord: NinaCoordinator) -> None:
     reg = dr.async_get(hass)
-    present = {f"{coord.instance}_{i}" for i in (coord.data or {})}
+    present = {f"{coord.instance}_{i}" for i in (coord.data or {})} | {f"{coord.instance}_hub"}
     for dev in dr.async_entries_for_config_entry(reg, entry.entry_id):
         idents = [i for dom, i in dev.identifiers if dom == DOMAIN]
         if idents and not any(i in present for i in idents):
@@ -104,7 +105,7 @@ def _targets(hass: HomeAssistant, call: ServiceCall) -> list[tuple[NinaCoordinat
                 continue
             coord: NinaCoordinator = e.runtime_data
             for dom, ident in dev.identifiers:
-                if dom == DOMAIN and ident.startswith(coord.instance + "_"):
+                if dom == DOMAIN and ident.startswith(coord.instance + "_") and ident.rsplit("_", 1)[1].isdigit():
                     hit = (coord, int(ident.rsplit("_", 1)[1]))
         if not hit:
             raise ServiceValidationError(f"{dev.name} is not a NINA device")

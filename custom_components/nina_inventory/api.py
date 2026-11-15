@@ -62,5 +62,9 @@ class NinaApi:
     async def check(self, device_id: int) -> dict:
         return await self._call("POST", f"/geraete/{device_id}/pruefen", {})
 
+    async def task(self, task: str) -> dict:
+        """Run a container task now: scan | opnsense | agent (container 2.4.0+)."""
+        return await self._call("POST", f"/aufgabe/{task}", {}, timeout=900)
+
     async def scan(self, network_id: int | None = None) -> dict:
         return await self._call("POST", "/scan", {"netzwerk_id": network_id} if network_id else {}, timeout=900)

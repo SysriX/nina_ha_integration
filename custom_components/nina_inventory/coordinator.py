@@ -24,6 +24,7 @@ class NinaCoordinator(DataUpdateCoordinator[dict[int, dict]]):
         self.api = api
         self.instance = instance
         self.unsubs: list = []
+        self.info: dict = {}
 
     def included(self, d: dict) -> bool:
         types = self.config_entry.options.get(CONF_TYPES) or []

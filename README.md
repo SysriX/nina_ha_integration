@@ -6,7 +6,7 @@ Brings the devices of a [NINA](https://github.com/SysriX/nina_unraid) container 
 *Device page in the NINA web UI (UI in German)*
 
 Integration domain: `nina_inventory` (not `nina`, which is the built-in German warning app integration)  
-Version: 1.1.0  
+Version: 1.2.0  
 UI language of the container (sensor names from the pattern rules): German
 
 ## Features
@@ -31,6 +31,20 @@ UI language of the container (sensor names from the pattern rules): German
 | `button.…_wake` | Wake-on-LAN (if allowed for the device) – sent by the container or via OPNsense |
 | `button.…_check` | Ping the device now |
 | `button.…_<command>` / `switch.…` | Each HASS.Agent command (button/switch) |
+
+Since 1.2.0 the commands of **HASS.Agent .NET10** (shutdown, restart, cancel restart, sleep, hibernate, lock, log off, monitor off, update, custom commands …) are buttons as well; *restart* and *update* get the matching device class.
+
+## NINA device (since 1.2.0)
+
+The container itself appears as a device **NINA** with buttons to run its jobs right away (the same as *Jetzt ausführen* in the schedule):
+
+| Entity | Meaning |
+|---|---|
+| `button.haus_net_nina_scan` | Network scan of all networks with scanning enabled |
+| `button.haus_net_nina_opnsense` | Query OPNsense (ARP/DHCP) – only if OPNsense is configured |
+| `button.haus_net_nina_agent` | HASS.Agent sync (offline detection, new agents to *Nicht zugewiesen*) |
+
+OPNsense and agent sync need container 2.4.0+; with older containers only the scan button is created.
 
 ## Services
 
@@ -58,7 +72,7 @@ Update interval, only certain device types (the list comes live from the type ca
 ## Requirements
 
 - Home Assistant 2025.1 or newer
-- A running NINA container (1.1.0+ for multiple types per device; 1.0 works with the main type only) and an API key from *Benutzer & API*
+- A running NINA container (2.4.0+ for the NINA device buttons, 1.1.0+ for multiple types per device; 1.0 works with the main type only) and an API key from *Benutzer & API*
 - For discovery: container and Home Assistant in the same network (mDNS)
 
 ## Installation
